@@ -11,38 +11,6 @@
 		2.依赖于google的aapt工具，运行期间需要复制aapt至临时目录。linux64位上运行aapt时需要依赖32位库。
 		ipa解析:源码来自https://code.google.com/p/plist/
 	</description>
-	<properties>
-		<repository.url>http://sx.phone.i8app.com:8860</repository.url>
-	</properties>
-	<repositories>
-		<!-- 如果更新索引或下载JAR包失败, 在maven的conf/settings.xml 把141设为中央仓库的镜像仓库 
-		<mirror> 
-			<id>141</id> 
-			<name>141 nexus</name> 
-			<url>http://sx.phone.i8app.com:8860/content/groups/public/</url> 
-			<mirrorOf>central</mirrorOf> 
-		</mirror> -->
-		<repository>
-			<id>141</id>
-			<url>${repository.url}/content/groups/public/</url>
-			<releases>
-				<updatePolicy>always</updatePolicy>
-			</releases>
-			<snapshots>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>nexus-releases</id>
-			<url>${repository.url}/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<url>${repository.url}/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
