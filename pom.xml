@@ -1,0 +1,146 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.i8app.ezinstall</groupId>
+	<artifactId>packreader</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<description>ipa, apk解析工具
+		apk解析有两种方式: 1:直接读xml 2:使用google的aapt工具, 两种方式各有优缺点.
+		1.使用java解析xml,如果androidmanifest.xml的变量为@格式，引用自其它文件，则无法读取
+		2.依赖于google的aapt工具，运行期间需要复制aapt至临时目录。linux64位上运行aapt时需要依赖32位库。
+		ipa解析:源码来自https://code.google.com/p/plist/
+	</description>
+	<properties>
+		<repository.url>http://sx.phone.i8app.com:8860</repository.url>
+	</properties>
+	<repositories>
+		<!-- 如果更新索引或下载JAR包失败, 在maven的conf/settings.xml 把141设为中央仓库的镜像仓库 
+		<mirror> 
+			<id>141</id> 
+			<name>141 nexus</name> 
+			<url>http://sx.phone.i8app.com:8860/content/groups/public/</url> 
+			<mirrorOf>central</mirrorOf> 
+		</mirror> -->
+		<repository>
+			<id>141</id>
+			<url>${repository.url}/content/groups/public/</url>
+			<releases>
+				<updatePolicy>always</updatePolicy>
+			</releases>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<url>${repository.url}/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>${repository.url}/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- 解决maven和eclipse结合时的一个bug: 当根据pom.xml更新eclipse工程设置时, src/main/resources和src/test/resources的excluded选项被设成了** -->
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<ignoreMissingFile>true</ignoreMissingFile>
+					<file>.classpath</file>
+					<regex>false</regex>
+					<replacements>
+						<replacement>
+							<xpath>/classpath/classpathentry[@path='src/main/resources' and
+								@kind='src' and @excluding='**']/@excluding</xpath>
+							<token>**</token>
+							<value></value>
+						</replacement>
+						<replacement>
+							<xpath>/classpath/classpathentry[@path='src/test/resources' and
+								@kind='src' and @excluding='**']/@excluding</xpath>
+							<token>**</token>
+							<value></value>
+						</replacement>
+					</replacements>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.i8app.ezinstall.packreader.apk2.ApkReader2</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
